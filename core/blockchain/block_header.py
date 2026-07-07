@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from ..shared.hashable import Hashable
 
-@dataclass(frozen=True)
+@dataclass()
 class BlockHeader(Hashable):
     index: int
     timestamp: float

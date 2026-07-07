@@ -19,4 +19,6 @@ class Hashable:
     # Calculate the SHA-256 hash of the serialized object and store it in the hash attribute.
     def calculate_hash(self):
         # Serialize the object to a JSON string and calculate the SHA-256 hash
-        self.hash = sha256(hash_object(self.to_dict()).encode())
+        h = sha256(hash_object(self.to_dict()).encode())
+        self.hash = h
+        return h

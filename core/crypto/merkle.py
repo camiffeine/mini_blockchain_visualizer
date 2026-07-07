@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 
 from .hashing import sha256
-from ..blockchain.transaction import Transaction
 
 class SiblingPosition(Enum):
     LEFT = "left"
@@ -160,30 +159,3 @@ class MerkleTree:
             self.print_tree(node.right, level + 1)
             print(' ' * 4 * level + '->', node.hash)
             self.print_tree(node.left, level + 1)
-
-# Test usage (provisional)
-def main():
-    # create sample transactions
-    messages = [
-        Transaction("Hola"),
-        Transaction("Criptografía"),
-        Transaction("Post-cuántica"),
-        Transaction("UNAL!")
-    ]
-
-    tree = MerkleTree()
-    tree.build_tree(messages)
-    tree.print_tree(tree.root)
-
-    # pick index 1 ("Criptografía")
-    tx_hash = tree.leaves[1].hash
-    proof = tree.generate_proof(tx_hash)
-    print("Generated proof:")
-    proof.print_proof()
-
-    # verify
-    is_valid = MerkleTree.verify_proof(tx_hash, proof, tree.root.hash)
-    print("Proof valid:", is_valid)
-
-if __name__ == "__main__":
-    main()

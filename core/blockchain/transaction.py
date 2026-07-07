@@ -9,6 +9,7 @@ class Transaction(Hashable):
         self.amount = None
         self.timestamp = None
         self.metadata = metadata
+        self.hash = self.calculate_hash()
 
     # Convert the transaction to a dictionary representation.
     def to_dict(self):
