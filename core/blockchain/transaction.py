@@ -1,7 +1,7 @@
 from ..shared.hashable import Hashable
 
 class Transaction(Hashable):
-    # Represents a transaction in the blockchain.
+    # Represents a transaction in the blockchain
     def __init__(self, metadata):
         super().__init__()
         self.sender = None
@@ -11,7 +11,7 @@ class Transaction(Hashable):
         self.metadata = metadata
         self.hash = self.calculate_hash()
 
-    # Convert the transaction to a dictionary representation.
+    # Convert the transaction to a dictionary representation
     def to_dict(self):
         return {
             "hash": self.hash,
@@ -22,7 +22,7 @@ class Transaction(Hashable):
             "metadata": self.metadata
         }
 
-    # Populate the transaction from a dictionary representation.
+    # Populate the transaction from a dictionary representation
     def from_dict(self, data):
         self.hash = data.get("hash")
         self.sender = data.get("sender")

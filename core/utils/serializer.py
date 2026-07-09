@@ -1,7 +1,7 @@
 import json
 
 class Serializer:
-    # Serialize an object to a JSON string.
+    # Serialize an object to a JSON string
     @staticmethod
     def serialize(obj) -> str:
         if hasattr(obj, "to_dict"):

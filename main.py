@@ -21,9 +21,8 @@ def test_merkle_tree(transactions):
 
 # Test the Block structure implementation
 def test_block(transactions):
-    block = Block(0, transactions)
+    block = Block(0, "0" * 64, transactions)
     block.build_merkle_tree()
-    block.build_block_header(previous_hash="0" * 64)
     block.calculate_hash()
     block.print_block()
 

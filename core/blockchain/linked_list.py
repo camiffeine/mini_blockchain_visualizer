@@ -1,4 +1,7 @@
-from .node import Node
+class Node:
+    def __init__(self):
+        self.block = None
+        self.next = None
 
 class LinkedList:
     def __init__(self):
@@ -6,7 +9,7 @@ class LinkedList:
         self.tail = None
         self.length = 0
 
-    # Append a node to the end of the linked list.
+    # Append a node to the end of the linked list
     def append(self, node: Node):
         if not self.head:
             self.head = node
@@ -16,7 +19,7 @@ class LinkedList:
             self.tail = node
         self.length += 1
 
-    # Remove a node from the linked list.
+    # Remove a node from the linked list
     def remove(self, node: Node):
         if not self.head:
             return
@@ -38,7 +41,7 @@ class LinkedList:
                 self.tail = current
             self.length -= 1
 
-    # Find a node in the linked list.
+    # Find a node in the linked list
     def find(self, node: Node):
         current = self.head
         while current:
@@ -47,14 +50,14 @@ class LinkedList:
             current = current.next
         return False
 
-    # Iterate over the nodes in the linked list.
+    # Iterate over the nodes in the linked list
     def iterate(self):
         current = self.head
         while current:
             yield current
             current = current.next
 
-    # Convert the linked list to a list of nodes.
+    # Convert the linked list to a list of nodes
     def to_list(self):
         result = []
         current = self.head

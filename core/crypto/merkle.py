@@ -7,13 +7,13 @@ class SiblingPosition(Enum):
     LEFT = "left"
     RIGHT = "right"
 
-# ProofStep represents a single step in the Merkle proof, containing the sibling hash and its position (left or right).
+# ProofStep represents a single step in the Merkle proof, containing the sibling hash and its position (left or right)
 @dataclass(frozen=True)
 class ProofStep:
     sibling_hash: str
     position: SiblingPosition
 
-# MerkleProof represents the entire Merkle proof for a transaction, including the transaction hash, the Merkle root, and a list of proof steps.
+# MerkleProof represents the entire Merkle proof for a transaction, including the transaction hash, the Merkle root, and a list of proof steps
 @dataclass(frozen=True)
 class MerkleProof:
     transaction_hash: str
@@ -35,14 +35,14 @@ class MerkleProof:
         for step in self.proof_steps:
             print(f"  Sibling Hash: {step.sibling_hash}, Position: {step.position.value}")
 
-# MerkleNode represents a node in the Merkle tree, containing references to its left and right child nodes and its hash value.
+# MerkleNode represents a node in the Merkle tree, containing references to its left and right child nodes and its hash value
 class MerkleNode:
     def __init__(self):
         self.left = None
         self.right = None
         self.hash = None
 
-# MerkleTree represents the entire Merkle tree structure, allowing for building the tree from transactions, generating proofs, and verifying proofs.
+# MerkleTree represents the entire Merkle tree structure, allowing for building the tree from transactions, generating proofs, and verifying proofs
 class MerkleTree:
     def __init__(self):
         self.root = None
@@ -79,12 +79,9 @@ class MerkleTree:
         # Set the root of the tree
         self.root = current_level[0] if current_level else None
 
-    # This method should generate a proof for a given transaction, which consists of the hashes of the sibling nodes along the path from the leaf node to the root.
+    # This method should generate a proof for a given transaction, which consists of the hashes of the sibling nodes along the path from the leaf node to the root
     def generate_proof(self, transaction_hash: str) -> MerkleProof:
-        """
-        Build a MerkleProof for the provided transaction_hash (hex string).
-        Raises ValueError if the transaction_hash is not found among leaves.
-        """
+        #Raises ValueError if the transaction_hash is not found among leaves.
         if not self.leaves:
             raise ValueError("Tree has no leaves")
 
@@ -134,7 +131,7 @@ class MerkleTree:
         merkle_root: str = levels[-1][0] if levels[-1] else str(None)
         return MerkleProof(transaction_hash=transaction_hash, merkle_root=merkle_root, proof_steps=proof_steps)
 
-    # This method should verify a proof for a given transaction by reconstructing the path from the leaf node to the root using the provided proof and comparing the resulting hash with the root hash.
+    # This method should verify a proof for a given transaction by reconstructing the path from the leaf node to the root using the provided proof and comparing the resulting hash with the root hash
     @staticmethod
     def verify_proof(transaction_hash: str, proof: MerkleProof, merkle_root: str) -> bool:
         # Optional sanity check: ensure proof was generated for this tx hash

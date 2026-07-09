@@ -4,21 +4,23 @@ from .block_header import BlockHeader
 import time
 
 class Block(Hashable):
-    def __init__(self, block_index, transactions):
+    def __init__(self, block_index, previous_hash, transactions):
         super().__init__()
-        # store the block index passed to the constructor
+        # Store the block index passed to the constructor
         self.index = block_index
         self.header = None
         self.merkle_tree = None
         self.transactions = transactions
+        self.build_merkle_tree()
+        self.build_block_header(previous_hash)
 
-    # Build the Merkle tree from the block's transactions.
+    # Build the Merkle tree from the block's transactions
     def build_merkle_tree(self):
         if self.transactions is not None and len(self.transactions) > 0:
             self.merkle_tree = MerkleTree()
             self.merkle_tree.build_tree(self.transactions)
 
-    # Build the block header using the previous block's hash.
+    # Build the block header using the previous block's hash
     def build_block_header(self, previous_hash):
         self.header = BlockHeader(
             # use the stored block index (fallback to 0)
@@ -32,11 +34,11 @@ class Block(Hashable):
             previous_hash=previous_hash
         )
 
-    # Calculate the hash of the block header and update the block's hash.
+    # Calculate the hash of the block header and update the block's hash
     def calculate_hash(self):
         self.header.block_hash = self.header.calculate_hash()
 
-    # Validate the block by checking the integrity of its hash and Merkle root.
+    # Validate the block by checking the integrity of its hash and Merkle root
     def validate(self):
         original_hash = self.header.block_hash
         original_merkle_root = self.header.merkle_root
@@ -45,7 +47,7 @@ class Block(Hashable):
         self.build_merkle_tree()
         self.header.merkle_root = self.merkle_tree.root.hash if self.merkle_tree and self.merkle_tree.root else ""
 
-        # Validate the block by comparing the original hash and Merkle root with the recalculated values.
+        # Validate the block by comparing the original hash and Merkle root with the recalculated values
         return self.header.block_hash == original_hash and self.header.merkle_root == original_merkle_root
 
     def print_block(self):
