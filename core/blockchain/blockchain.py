@@ -1,7 +1,6 @@
 from .transaction import Transaction
 from .linked_list import LinkedList, Node
 from .block import Block
-from .block_header import BlockHeader
 
 MAX_TRANSACTIONS_PER_BLOCK = 4
 
@@ -31,10 +30,7 @@ class Blockchain:
             print("Invalid transaction. Must be an instance of Transaction class.")
             return
 
-        # Validate transaction
-        if transaction.sender != "" or transaction.receiver != "" or transaction.amount < 0:
-            print("Invalid transaction.")
-            return
+        # TODO: Implement transaction validation
 
         # Add the transaction to the list of pending transactions
         self.pending_transactions.append(transaction)
@@ -62,3 +58,44 @@ class Blockchain:
 
         # Clear pending transactions after creating the block
         self.pending_transactions = []
+
+    # TODO: Validate the blockchain integrity by checking the internal consistency of each block and the links between them. Returns True if valid, False otherwise
+    def validate_chain(self):
+        pass
+
+    # Print the entire blockchain, including each block's details and transactions
+    def print_chain(self):
+        current = self.chain.head
+        while current:
+            current.block.print_block()
+            print("-" * 40)
+            current = current.next
+
+    # Get the last block in the blockchain. Returns None if the blockchain is empty
+    def get_last_block(self):
+        return self.chain.tail.block if self.chain.tail else None
+
+    # Get a block from the blockchain by its index. Returns None if the block is not found
+    def get_block(self, index: int):
+        current = self.chain.head
+        while current:
+            if current.block.header.index == index:
+                return current.block
+            current = current.next
+        return None
+
+    def tamper_transaction(self, block_index: int, transaction_index: int, new_transaction: Transaction):
+        block: Block | None = self.get_block(block_index)
+        if block is None:
+            print(f"Block {block_index} not found.")
+            return
+
+        if transaction_index < 0 or transaction_index >= len(block.transactions):
+            print(f"Transaction index {transaction_index} is out of bounds for block {block_index}.")
+            return
+
+        # Tamper with the specified transaction
+        block.transactions[transaction_index] = new_transaction
+        # Rebuild the Merkle tree and recalculate the block hash after tampering
+        block.build_merkle_tree()
+        block.calculate_hash()

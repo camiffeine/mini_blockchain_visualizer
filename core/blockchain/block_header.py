@@ -4,7 +4,7 @@ from ..shared.hashable import Hashable
 @dataclass()
 class BlockHeader(Hashable):
     index: int
-    timestamp: float
+    #timestamp: float
     merkle_root: str
     nonce: int
     difficulty: int
@@ -14,7 +14,7 @@ class BlockHeader(Hashable):
     def to_dict(self):
         return {
             "index": self.index,
-            "timestamp": self.timestamp,
+            #"timestamp": self.timestamp,
             "merkle_root": self.merkle_root,
             "nonce": self.nonce,
             "difficulty": self.difficulty,
@@ -25,7 +25,7 @@ class BlockHeader(Hashable):
     def from_dict(self, data):
         return BlockHeader(
             index=data.get("index"),
-            timestamp=data.get("timestamp"),
+            #timestamp=data.get("timestamp"),
             merkle_root=data.get("merkle_root"),
             nonce=data.get("nonce"),
             difficulty=data.get("difficulty"),

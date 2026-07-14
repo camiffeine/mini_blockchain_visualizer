@@ -1,6 +1,7 @@
 from core.crypto.merkle import *
 from core.blockchain.transaction import Transaction
 from core.blockchain.block import Block
+from core.blockchain.blockchain import Blockchain
 
 # Test the Merkle tree implementation
 def test_merkle_tree(transactions):
@@ -26,6 +27,23 @@ def test_block(transactions):
     block.calculate_hash()
     block.print_block()
 
+# Test the Blockchain implementation
+def test_blockchain(transactions):
+    blockchain = Blockchain()
+    # Add some transactions
+    for transaction in transactions:
+        blockchain.add_transaction(transaction)
+
+    # Create a new block with the pending transactions
+    blockchain.create_block()
+
+    # Validate the blockchain
+    is_valid = blockchain.validate_chain()
+    print("Blockchain valid:", is_valid)
+
+    # Print the entire blockchain
+    blockchain.print_chain()
+
 def main():
     # Create sample transactions
     transactions = [
@@ -35,7 +53,8 @@ def main():
         Transaction("UNAL!"),
     ]
     #test_merkle_tree(transactions)
-    test_block(transactions)
+    #test_block(transactions)
+    #test_blockchain(transactions)
 
 if __name__ == "__main__":
     main()
