@@ -47,7 +47,7 @@ class Blockchain:
             return
 
         # Create a new block with the next index and pending transactions
-        previous_hash = self.chain.tail.block.header.block_hash if self.chain.tail else "0" * 64
+        previous_hash = self.chain.tail.block.header.hash if self.chain.tail else "0" * 64
         new_block = Block(self.chain.length, previous_hash, self.pending_transactions)
         new_block.build_merkle_tree()
         new_block.calculate_hash()
@@ -59,9 +59,28 @@ class Blockchain:
         # Clear pending transactions after creating the block
         self.pending_transactions = []
 
-    # TODO: Validate the blockchain integrity by checking the internal consistency of each block and the links between them. Returns True if valid, False otherwise
+    # Validate the blockchain integrity by checking the internal consistency of each block and the links between them. Returns True if valid, False otherwise
     def validate_chain(self):
-        pass
+        current_block = self.chain.head.next  # Start from the second block (index 1) since the genesis block has no previous block
+        previous_hash = self.chain.head.block.header.hash if self.chain.head else None
+        current_hash = current_block.block.header.hash if current_block else None
+        while current_block:
+            # Validate the current block's integrity
+            if not current_block.block.validate():
+                print(f"Block {current_block.block.header.index} failed validation.")
+                return False
+
+            # Check if the current block's previous hash matches the previous block's hash
+            if current_block.block.header.previous_hash != previous_hash:
+                print(f"Block {current_block.block.header.index} has an invalid previous hash.")
+                return False
+
+            # Update previous_hash for the next iteration
+            current_block = current_block.next
+            previous_hash = current_hash
+            current_hash = current_block.block.header.hash if current_block else None
+
+        return True
 
     # Print the entire blockchain, including each block's details and transactions
     def print_chain(self):
