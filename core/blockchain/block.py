@@ -47,19 +47,19 @@ class Block(Hashable):
         rebuilt_tree.build_tree(self.transactions)
         rebuilt_root = rebuilt_tree.root.hash
 
-        print(f"Old Merkle Root: {self.header.merkle_root}")
-        print(f"New Merkle Root: {rebuilt_root if rebuilt_root else ''}")
+        #print(f"Old Merkle Root: {self.header.merkle_root}")
+        #print(f"New Merkle Root: {rebuilt_root if rebuilt_root else ''}")
 
         # Temporal new Block Header hash calc
         rebuilt_header = self.header.from_dict(self.header.to_dict())
         rebuilt_header.hash = None # Reset the hash to force recalculation
         recalculated_hash = rebuilt_header.calculate_hash()
 
-        print(f"Old Block Hash: {self.header.hash}")
-        print(f"New Block Hash: {recalculated_hash}")
+        #print(f"Old Block Hash: {self.header.hash}")
+        #print(f"New Block Hash: {recalculated_hash}")
 
-        print(f"Old Header: {self.header.to_dict()}")
-        print(f"New Header: {rebuilt_header.to_dict()}")
+        #print(f"Old Header: {self.header.to_dict()}")
+        #print(f"New Header: {rebuilt_header.to_dict()}")
 
         if rebuilt_root != self.header.merkle_root:
             return False
