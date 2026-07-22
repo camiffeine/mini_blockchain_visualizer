@@ -1,6 +1,5 @@
 from core.crypto.merkle import *
 from core.blockchain.transaction import Transaction
-from core.blockchain.block import Block
 from core.blockchain.blockchain import Blockchain
 
 def main_menu():
@@ -80,7 +79,7 @@ def create_and_verify_merkle_proof(blockchain):
             print("Creation of Merkle Proof")
             transaction = block.merkle_tree.leaves[transaction_index]
             print(f"Metadata of selected transaction: {block.transactions[transaction_index].metadata}")
-            proof = block.merkle_tree.generate_proof(transaction.hash)
+            proof = block.merkle_tree.generate_proof(transaction_index)
             if proof:
                 print(f"Merkle Proof for Transaction at index {transaction_index} in Block {block_index}:")
                 proof.print_proof()
@@ -89,7 +88,7 @@ def create_and_verify_merkle_proof(blockchain):
 
             print(" " * 40)
             print("Verification of Merkle Proof")
-            is_valid = MerkleTree.verify_proof(transaction.hash, proof, block.merkle_tree.root.hash)
+            is_valid = MerkleTree.verify_proof(transaction.hash, proof, block.header.merkle_root)
             print("Merkle Proof valid:", is_valid)
         else:
             print(f"Transaction index {transaction_index} is out of bounds for block {block_index}.")

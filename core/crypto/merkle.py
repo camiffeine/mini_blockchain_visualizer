@@ -80,7 +80,7 @@ class MerkleTree:
         self.root = current_level[0] if current_level else None
 
     # This method should generate a proof for a given transaction, which consists of the hashes of the sibling nodes along the path from the leaf node to the root
-    def generate_proof(self, transaction_hash: str) -> MerkleProof:
+    def generate_proof(self, transaction_index: int) -> MerkleProof:
         #Raises ValueError if the transaction_hash is not found among leaves.
         if not self.leaves:
             raise ValueError("Tree has no leaves")
@@ -102,14 +102,14 @@ class MerkleTree:
                 next_level.append(parent_hash)
             levels.append(next_level)
 
-        # Find the leaf index for the requested transaction_hash
+        # Find the leaf index for the requested transaction index
         try:
-            index = levels[0].index(transaction_hash)
-        except ValueError:
-            raise ValueError("Transaction hash not found in tree leaves")
+            leaf = levels[0][transaction_index]
+        except IndexError:
+            raise ValueError("Transaction index out of bounds or not found in leaves.")
 
         proof_steps: list[ProofStep] = []
-        idx = index
+        idx = transaction_index
 
         # For each level, collect sibling info and move index to parent
         for level in levels[:-1]:
@@ -129,7 +129,7 @@ class MerkleTree:
             idx //= 2  # move to parent index
 
         merkle_root: str = levels[-1][0] if levels[-1] else str(None)
-        return MerkleProof(transaction_hash=transaction_hash, merkle_root=merkle_root, proof_steps=proof_steps)
+        return MerkleProof(transaction_hash=leaf, merkle_root=merkle_root, proof_steps=proof_steps)
 
     # This method should verify a proof for a given transaction by reconstructing the path from the leaf node to the root using the provided proof and comparing the resulting hash with the root hash
     @staticmethod
