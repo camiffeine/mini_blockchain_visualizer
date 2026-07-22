@@ -133,7 +133,7 @@ class MerkleTree:
 
     # This method should verify a proof for a given transaction by reconstructing the path from the leaf node to the root using the provided proof and comparing the resulting hash with the root hash
     @staticmethod
-    def verify_proof(transaction_hash: str, proof: MerkleProof, merkle_root: str) -> bool:
+    def verify_proof(transaction_hash: str, proof: MerkleProof, expected_merkle_root: str) -> bool:
         # Optional sanity check: ensure proof was generated for this tx hash
         if proof.transaction_hash and proof.transaction_hash != transaction_hash:
             return False
@@ -148,7 +148,7 @@ class MerkleTree:
                 # sibling is to the left: H(sibling || current)
                 current_hash = sha256((step.sibling_hash + current_hash).encode())
 
-        return current_hash == merkle_root
+        return current_hash == expected_merkle_root
 
     # Utility function to print the tree structure
     def print_tree(self, node, level=0):

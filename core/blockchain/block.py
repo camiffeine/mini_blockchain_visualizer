@@ -42,10 +42,11 @@ class Block(Hashable):
 
     # Internally validate the block by checking the integrity of its hash and Merkle root
     def validate(self) -> bool:
-        # Temporal new Merkle Tree build
-        rebuilt_tree = MerkleTree()
-        rebuilt_tree.build_tree(self.transactions)
-        rebuilt_root = rebuilt_tree.root.hash
+        # Temporal new Merkle Tree build if not genesis block
+        if len(self.transactions) > 0:
+            rebuilt_tree = MerkleTree()
+            rebuilt_tree.build_tree(self.transactions)
+            rebuilt_root = rebuilt_tree.root.hash
 
         #print(f"Old Merkle Root: {self.header.merkle_root}")
         #print(f"New Merkle Root: {rebuilt_root if rebuilt_root else ''}")
@@ -61,7 +62,7 @@ class Block(Hashable):
         #print(f"Old Header: {self.header.to_dict()}")
         #print(f"New Header: {rebuilt_header.to_dict()}")
 
-        if rebuilt_root != self.header.merkle_root:
+        if len(self.transactions) > 0 and rebuilt_root != self.header.merkle_root:
             return False
 
         if recalculated_hash != self.header.hash or recalculated_hash != self.hash:
@@ -79,5 +80,8 @@ class Block(Hashable):
         print(f"Block Hash: {self.header.hash}")
         print(f"Previous Hash: {self.header.previous_hash}")
         print("Transactions:")
-        for transaction in self.transactions:
-            print(transaction.to_dict())
+        if len(self.transactions) > 0:
+            for transaction in self.transactions:
+                print(transaction.to_dict())
+        else:
+            print("No available transactions at this block.")

@@ -17,7 +17,7 @@ def test_merkle_tree(transactions):
     proof.print_proof()
 
     # Verify
-    is_valid = MerkleTree.verify_proof(tx_hash, proof, tree.root.hash)
+    is_valid = tree.verify_proof(tx_hash, proof, tree.root.hash)
     print("Proof valid:", is_valid)
 
 # Test the Block structure implementation
