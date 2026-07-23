@@ -96,13 +96,13 @@ def test_blockchain_tampering(transactions, tamper_tx):
 def main():
     # Create sample transactions
     transactions = [
-        Transaction("Hola"),
-        Transaction("Criptografía"),
-        Transaction("Post-cuántica"),
-        Transaction("UNAL!"),
+        Transaction(None, None, 0, "Hola"),
+        Transaction(None, None, 0, "Criptografía"),
+        Transaction(None, None, 0, "Post-cuántica"),
+        Transaction(None, None, 0, "UNAL!"),
     ]
 
-    tamper_tx = Transaction("Tampering_tx!")
+    tamper_tx = Transaction(None, None, 0, "Tampering_tx!")
 
     #test_merkle_tree(transactions)
     #test_block(transactions)
