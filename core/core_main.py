@@ -19,7 +19,7 @@ def main_menu():
 # Create a new transaction by prompting the user for metadata and adding it to the blockchain's pending transactions
 def create_transaction(blockchain):
     metadata = input("Enter transaction metadata: ")
-    transaction = Transaction(metadata)
+    transaction = Transaction(None, None, 0, metadata)
     blockchain.add_transaction(transaction)
     print("Transaction added.")
     print(" ")

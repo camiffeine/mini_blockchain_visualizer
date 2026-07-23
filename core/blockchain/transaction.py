@@ -1,13 +1,21 @@
+from datetime import datetime
+
 from ..shared.hashable import Hashable
 
 class Transaction(Hashable):
     # Represents a transaction in the blockchain
-    def __init__(self, metadata):
+    def __init__(
+            self,
+            sender,
+            receiver,
+            amount,
+            metadata
+            ):
         super().__init__()
-        self.sender = None
-        self.receiver = None
-        self.amount = None
-        self.timestamp = None
+        self.sender = sender
+        self.receiver = receiver
+        self.amount = amount
+        self.timestamp = datetime.now()
         self.metadata = metadata
         self.hash = self.calculate_hash()
 
@@ -18,7 +26,7 @@ class Transaction(Hashable):
             "sender": self.sender,
             "receiver": self.receiver,
             "amount": self.amount,
-            "timestamp": self.timestamp,
+            "timestamp": self.timestamp.isoformat(),
             "metadata": self.metadata
         }
 
@@ -28,5 +36,5 @@ class Transaction(Hashable):
         self.sender = data.get("sender")
         self.receiver = data.get("receiver")
         self.amount = data.get("amount")
-        self.timestamp = data.get("timestamp")
+        self.timestamp = datetime.fromisoformat(data.get("timestamp"))
         self.metadata = data.get("metadata")
