@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Mini Merkle blockchain explorer with dashboard, chain, block details, and Merkle tree views."
+    />
+    <title>Mini Merkle Blockchain</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+    <script type="module" src="/static/app.js" defer></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="masthead">
+        <div class="masthead-copy">
+          <p class="eyebrow">Blockchain explorer</p>
+          <h1>Mini Merkle Blockchain</h1>
+          <p class="lede">
+            A compact frontend for inspecting the chain, checking status, and exploring each block's Merkle tree.
+          </p>
+        </div>
+        <div class="masthead-panel">
+          <div class="panel-label">Live status</div>
+          <div id="connectionBadge" class="status-chip status-chip--loading">Connecting to backend...</div>
+          <div id="lastUpdated" class="panel-note">Waiting for blockchain data.</div>
+        </div>
+      </header>
+
+      <nav class="tabs" aria-label="Application views">
+        <button class="tab is-active" data-route="dashboard" type="button">Dashboard</button>
+        <button class="tab" data-route="blockchain" type="button">Blockchain</button>
+        <button class="tab" data-route="details" type="button">Block Details</button>
+        <button class="tab" data-route="merkle" type="button">Merkle Tree</button>
+        <button id="refreshButton" class="tab tab--action" type="button">Refresh</button>
+      </nav>
+
+      <main id="content" class="content" aria-live="polite"></main>
+    </div>
+  </body>
+</html>
