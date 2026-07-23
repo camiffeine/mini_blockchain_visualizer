@@ -29,7 +29,7 @@ def tamper_transaction(blockchain):
     block_index = int(input("Enter block index to tamper: "))
     transaction_index = int(input("Enter transaction index to tamper: "))
     new_metadata = input("Enter new transaction metadata: ")
-    new_transaction = Transaction(new_metadata)
+    new_transaction = Transaction(None, None, 0, new_metadata)
     blockchain.tamper_transaction(block_index, transaction_index, new_transaction)
     print(f"Transaction at index {transaction_index} in block {block_index} has been tampered.")
     print(" ")
@@ -57,7 +57,6 @@ def print_block(blockchain):
     block = blockchain.get_block(block_index)
     if block:
         block.print_block()
-        print(f"Valid block: {block.validate()}")
         print("-" * 40)
         print(f"Merkle Tree of Block {block_index}:")
         if len(block.transactions) == 0:

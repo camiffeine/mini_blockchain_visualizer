@@ -1,3 +1,6 @@
+from .block_schemas import BlockResponse
+from .transaction_schemas import TransactionResponse
+
 from pydantic import BaseModel, Field
 from typing import List, Optional
 from datetime import datetime
@@ -23,7 +26,7 @@ class BlockchainStatusResponse(BaseModel):
         description="The hash of the last block in the blockchain."
     )
 
-    pending_transactions: list = Field(
+    pending_transactions: List[TransactionResponse] = Field(
         ...,
         description="A list of pending transactions that have not yet been included in a block."
     )
@@ -31,4 +34,10 @@ class BlockchainStatusResponse(BaseModel):
     message: Optional[str] = Field(
         None,
         description="An optional message providing additional information about the blockchain status."
+    )
+
+class BlockchainGetBlockchainResponse(BaseModel):
+    chain: List[BlockResponse] = Field(
+        ...,
+        description="A list of blocks in the blockchain."
     )

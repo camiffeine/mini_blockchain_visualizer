@@ -59,6 +59,7 @@ class Blockchain:
         # Clear pending transactions after creating the block
         self.pending_transactions = []
         print("New block created.")
+        return new_block
 
     # Validate the blockchain integrity by checking the internal consistency of each block and the links between them. Returns True if valid, False otherwise
     def validate_chain(self):
@@ -104,6 +105,17 @@ class Blockchain:
             current = current.next
         return None
 
+    # Get the entire blockchain as a list of dictionaries, where each dictionary represents a block's data
+    def get_chain(self):
+        chain_data = []
+        current = self.chain.head
+        while current:
+            block_data = current.block.to_dict()
+            chain_data.append(block_data)
+            current = current.next
+        return chain_data
+
+    # Tamper with a specific transaction in a block by providing the block index, transaction index, and new transaction. Rebuilds the Merkle tree and recalculates the block hash after tampering
     def tamper_transaction(self, block_index: int, transaction_index: int, new_transaction: Transaction):
         block: Block | None = self.get_block(block_index)
         if block is None:
@@ -117,6 +129,6 @@ class Blockchain:
         # Tamper with the specified transaction
         block.transactions[transaction_index] = new_transaction
         # Rebuild the Merkle tree and recalculate the block hash after tampering
-        block.merkle_tree = None  # Reset the Merkle tree before rebuilding
-        block.build_merkle_tree()
-        block.calculate_hash()
+        #block.merkle_tree = None  # Reset the Merkle tree before rebuilding
+        #block.build_merkle_tree()
+        #block.calculate_hash()

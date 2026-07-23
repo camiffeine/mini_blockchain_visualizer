@@ -70,9 +70,24 @@ class Block(Hashable):
 
         return True
 
+    # Convert the block to a dictionary representation, including its header and transactions
+    def to_dict(self):
+        return {
+            "index": self.index,
+            "valid": self.validate(),
+            "timestamp": self.header.timestamp,
+            "merkle_root": self.header.merkle_root,
+            "nonce": self.header.nonce,
+            "difficulty": self.header.difficulty,
+            "hash": self.hash,
+            "previous_hash": self.header.previous_hash,
+            "transactions": [tx.to_dict() for tx in self.transactions] if self.transactions else [],
+        }
+
     # Print the block's details, including its header and transactions
     def print_block(self):
         print(f"Block Index: {self.header.index}")
+        print(f"Block Valid: {self.validate()}")
         print(f"Timestamp: {self.header.timestamp}")
         print(f"Merkle Root: {self.header.merkle_root}")
         print(f"Nonce: {self.header.nonce}")
