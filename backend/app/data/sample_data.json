@@ -1,0 +1,88 @@
+{
+	"/transactions/add": [
+		{
+			"sender": "alice.wallet",
+			"receiver": "bob.wallet",
+			"amount": 25.5,
+			"metadata": "Payment for lunch"
+		},
+		{
+			"sender": "mining.pool",
+			"receiver": "carol.wallet",
+			"amount": 0.75,
+			"metadata": "Block reward distribution"
+		},
+		{
+			"sender": "dave.wallet",
+			"receiver": "eve.wallet",
+			"amount": 100,
+			"metadata": null
+		},
+		{
+			"sender": "frank.wallet",
+			"receiver": "grace.wallet",
+			"amount": 50.25,
+			"metadata": "Freelance work payment"
+		},
+		{
+			"sender": "hope.wallet",
+			"receiver": "ivan.wallet",
+			"amount": 12.99,
+			"metadata": "Coffee shop payment"
+		},
+		{
+			"sender": "trading.bot",
+			"receiver": "jack.wallet",
+			"amount": 500,
+			"metadata": "Automated trade execution"
+		},
+		{
+			"sender": "karen.wallet",
+			"receiver": "leo.wallet",
+			"amount": 75.5,
+			"metadata": "Rent payment - June"
+		},
+		{
+			"sender": "mining.pool",
+			"receiver": "maria.wallet",
+			"amount": 0.5,
+			"metadata": "Block reward"
+		},
+		{
+			"sender": "noah.wallet",
+			"receiver": "olivia.wallet",
+			"amount": 33.33,
+			"metadata": "Split dinner cost"
+		},
+		{
+			"sender": "platform.fees",
+			"receiver": "reserve.pool",
+			"amount": 10.75,
+			"metadata": "Transaction fees collected"
+		},
+		{
+			"sender": "patricia.wallet",
+			"receiver": "quinn.wallet",
+			"amount": 200,
+			"metadata": "Consulting services"
+		},
+		{
+			"sender": "robert.wallet",
+			"receiver": "sarah.wallet",
+			"amount": 45.0,
+			"metadata": "Birthday gift"
+		},
+		{
+			"sender": "trading.account",
+			"receiver": "treasury.vault",
+			"amount": 1000.5,
+			"metadata": "Profit transfer"
+		},
+		{
+			"sender": "uma.wallet",
+			"receiver": "victor.wallet",
+			"amount": 15.5,
+			"metadata": "Tutoring payment"
+		}
+	]
+}
