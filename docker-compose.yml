@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  # Mini Merkle Blockchain Backend and Frontend
+  blockchain:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: mini-merkle-blockchain
+    ports:
+      - "8000:8000"
+    environment:
+      - BACKEND_HOST=0.0.0.0
+      - BACKEND_PORT=8000
+      - DEBUG=False
+      - LOG_LEVEL=INFO
+      - PYTHONUNBUFFERED=1
+    volumes:
+      # Mount logs directory to host machine for persistence
+      - ./logs:/app/logs
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/blockchain/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - blockchain-network
+
+networks:
+  blockchain-network:
+    driver: bridge

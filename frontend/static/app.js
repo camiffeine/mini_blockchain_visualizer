@@ -13,6 +13,8 @@ const state = {
   loading: true,
   error: null,
   lastRefresh: null,
+  notice: null,
+  merkleProof: null,
 };
 
 function escapeHtml(value) {
@@ -332,6 +334,40 @@ function buildDashboardView() {
           `}
         </section>
       </div>
+
+      <section class="action-panel">
+        <div class="section-header">
+          <div>
+            <h3>Quick actions</h3>
+            <p>Submit a transaction or package the pending pool into a new block.</p>
+          </div>
+          <button id="createBlockButton" class="secondary-button" type="button">Create block</button>
+        </div>
+
+        <form id="transactionForm" class="action-form">
+          <div class="field-grid">
+            <label class="field">
+              <span>Sender</span>
+              <input type="text" name="sender" placeholder="Alice" required />
+            </label>
+            <label class="field">
+              <span>Receiver</span>
+              <input type="text" name="receiver" placeholder="Bob" required />
+            </label>
+            <label class="field">
+              <span>Amount</span>
+              <input type="number" name="amount" min="0.01" step="0.01" placeholder="10.00" required />
+            </label>
+            <label class="field field--wide">
+              <span>Metadata</span>
+              <input type="text" name="metadata" placeholder="Optional note" />
+            </label>
+          </div>
+          <div class="form-actions">
+            <button class="primary-button" type="submit">Add transaction</button>
+          </div>
+        </form>
+      </section>
     </section>
   `;
 }
@@ -498,6 +534,47 @@ function buildBlockDetailsView() {
                 </div>
               `}
             </div>
+
+            ${Array.isArray(block.transactions) && block.transactions.length > 0 ? `
+              <div class="section-card">
+                <div class="section-header">
+                  <div>
+                    <h3>Tamper transaction</h3>
+                    <p>Replace one transaction in the selected block to demonstrate integrity drift.</p>
+                  </div>
+                </div>
+
+                <form id="tamperForm" class="action-form" style="margin-top: 14px;">
+                  <div class="field-grid">
+                    <label class="field">
+                      <span>Transaction index</span>
+                      <select id="tamperTransactionIndex" name="transactionIndex">
+                        ${block.transactions.map((_, transactionIndex) => `<option value="${transactionIndex}">#${transactionIndex}</option>`).join("")}
+                      </select>
+                    </label>
+                    <label class="field">
+                      <span>Sender</span>
+                      <input type="text" name="sender" value="${escapeHtml(block.transactions[0]?.sender ?? "Alice")}" required />
+                    </label>
+                    <label class="field">
+                      <span>Receiver</span>
+                      <input type="text" name="receiver" value="${escapeHtml(block.transactions[0]?.receiver ?? "Bob")}" required />
+                    </label>
+                    <label class="field">
+                      <span>Amount</span>
+                      <input type="number" name="amount" min="0.01" step="0.01" value="${escapeHtml(Number(block.transactions[0]?.amount ?? 1).toFixed(2))}" required />
+                    </label>
+                    <label class="field field--wide">
+                      <span>Metadata</span>
+                      <input type="text" name="metadata" value="${escapeHtml(block.transactions[0]?.metadata ?? "tampered")}" />
+                    </label>
+                  </div>
+                  <div class="form-actions">
+                    <button class="primary-button" type="submit">Apply tamper</button>
+                  </div>
+                </form>
+              </div>
+            ` : ""}
           </section>
         </div>
       ` : `
@@ -534,6 +611,7 @@ function buildMerkleTreeView() {
   const index = getSelectedBlockIndex();
   const block = state.selectedBlockDetails;
   const root = block?.merkle_tree?.root;
+  const proof = state.merkleProof;
 
   return `
     <section class="view">
@@ -577,6 +655,49 @@ function buildMerkleTreeView() {
           </div>
         `}
       </section>
+
+      <section class="proof-shell">
+        <div class="section-header">
+          <div>
+            <h3>Merkle proof</h3>
+            <p>Inspect the proof for any transaction in this block.</p>
+          </div>
+        </div>
+
+        ${Array.isArray(block?.transactions) && block.transactions.length > 0 ? `
+          <form id="proofForm" class="proof-form" style="margin-top: 14px;">
+            <label class="field">
+              <span>Transaction index</span>
+              <select id="proofTransactionIndex" name="proofTransactionIndex">
+                ${block.transactions.map((_, transactionIndex) => `<option value="${transactionIndex}">#${transactionIndex}</option>`).join("")}
+              </select>
+            </label>
+            <button class="secondary-button" type="submit">Verify proof</button>
+          </form>
+        ` : ""}
+
+        ${proof ? `
+          <div class="proof-result ${proof.valid ? "proof-result--valid" : "proof-result--invalid"}">
+            <div class="proof-status">${proof.valid ? "Valid proof" : "Invalid proof"}</div>
+            <div class="proof-row"><span>Transaction hash</span><code>${escapeHtml(proof.proof.transaction_hash)}</code></div>
+            <div class="proof-row"><span>Merkle root</span><code>${escapeHtml(proof.proof.merkle_root)}</code></div>
+            <ul class="proof-list">
+              ${proof.proof.proof_steps.map((step, stepIndex) => `
+                <li class="proof-item">
+                  <span>Step ${stepIndex + 1}</span>
+                  <strong>${escapeHtml(step.direction)}</strong>
+                  <code>${escapeHtml(step.hash)}</code>
+                </li>
+              `).join("")}
+            </ul>
+          </div>
+        ` : Array.isArray(block?.transactions) && block.transactions.length > 0 ? `
+          <div class="empty-state" style="margin-top: 14px;">
+            <h3>No proof generated yet</h3>
+            <p>Select a transaction and run the proof verification to inspect the authentication path.</p>
+          </div>
+        ` : ""}
+      </section>
     </section>
   `;
 }
@@ -603,6 +724,17 @@ function buildErrorView() {
   `;
 }
 
+function renderNotice() {
+  if (!state.notice) {
+    return "";
+  }
+
+  const kind = state.notice.type === "error" ? "inline-banner--error" : "inline-banner--success";
+  return `
+    <div class="inline-banner ${kind}">${escapeHtml(state.notice.text)}</div>
+  `;
+}
+
 function render() {
   setActiveRouteButtons(state.route);
 
@@ -616,16 +748,18 @@ function render() {
     return;
   }
 
+  let nextView = "";
   if (state.route === "blockchain") {
-    content.innerHTML = buildBlockchainView();
+    nextView = buildBlockchainView();
   } else if (state.route === "details") {
-    content.innerHTML = buildBlockDetailsView();
+    nextView = buildBlockDetailsView();
   } else if (state.route === "merkle") {
-    content.innerHTML = buildMerkleTreeView();
+    nextView = buildMerkleTreeView();
   } else {
-    content.innerHTML = buildDashboardView();
+    nextView = buildDashboardView();
   }
 
+  content.innerHTML = `${renderNotice()}${nextView}`;
   bindDynamicHandlers();
 }
 
@@ -659,6 +793,110 @@ function bindDynamicHandlers() {
       navigate("merkle", nextIndex);
     });
   }
+
+  const transactionForm = document.getElementById("transactionForm");
+  if (transactionForm) {
+    transactionForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const formData = new FormData(transactionForm);
+      const payload = {
+        sender: String(formData.get("sender") || "").trim(),
+        receiver: String(formData.get("receiver") || "").trim(),
+        amount: Number(formData.get("amount")),
+        metadata: String(formData.get("metadata") || "").trim() || null,
+      };
+
+      try {
+        const response = await fetchJson("/transactions/add", {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        state.notice = { type: "success", text: `Transaction added: ${response.sender} → ${response.receiver}.` };
+        transactionForm.reset();
+        await loadBlockchainOverview();
+      } catch (error) {
+        state.notice = { type: "error", text: error instanceof Error ? error.message : String(error) };
+        render();
+      }
+    });
+  }
+
+  const createBlockButton = document.getElementById("createBlockButton");
+  if (createBlockButton) {
+    createBlockButton.addEventListener("click", async () => {
+      try {
+        await fetchJson("/blockchain/blocks");
+        state.notice = { type: "success", text: "A new block was created from the pending transactions." };
+        await loadBlockchainOverview();
+      } catch (error) {
+        state.notice = { type: "error", text: error instanceof Error ? error.message : String(error) };
+        render();
+      }
+    });
+  }
+
+  const tamperForm = document.getElementById("tamperForm");
+  if (tamperForm) {
+    const txIndexField = document.getElementById("tamperTransactionIndex");
+    const fillTamperFields = (transactionIndex) => {
+      const tx = state.selectedBlockDetails?.transactions?.[transactionIndex];
+      if (!tx) {
+        return;
+      }
+      tamperForm.elements.sender.value = tx.sender ?? "Alice";
+      tamperForm.elements.receiver.value = tx.receiver ?? "Bob";
+      tamperForm.elements.amount.value = Number(tx.amount ?? 1).toFixed(2);
+      tamperForm.elements.metadata.value = tx.metadata ?? "tampered";
+    };
+
+    if (txIndexField) {
+      txIndexField.addEventListener("change", (event) => {
+        fillTamperFields(Number(event.target.value));
+      });
+      fillTamperFields(Number(txIndexField.value));
+    }
+
+    tamperForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const transactionIndex = Number(tamperForm.elements.transactionIndex.value);
+      const payload = {
+        sender: String(tamperForm.elements.sender.value || "").trim(),
+        receiver: String(tamperForm.elements.receiver.value || "").trim(),
+        amount: Number(tamperForm.elements.amount.value),
+        metadata: String(tamperForm.elements.metadata.value || "").trim() || null,
+      };
+
+      try {
+        await fetchJson(`/transactions/tamper?block_index=${state.selectedBlockIndex}&transaction_index=${transactionIndex}`, {
+          method: "POST",
+          body: JSON.stringify(payload),
+        });
+        state.notice = { type: "success", text: `Tamper applied to block ${state.selectedBlockIndex}, transaction #${transactionIndex}.` };
+        state.merkleProof = null;
+        await loadBlockchainOverview();
+      } catch (error) {
+        state.notice = { type: "error", text: error instanceof Error ? error.message : String(error) };
+        render();
+      }
+    });
+  }
+
+  const proofForm = document.getElementById("proofForm");
+  if (proofForm) {
+    proofForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const transactionIndex = Number(new FormData(proofForm).get("proofTransactionIndex"));
+      const blockIndex = state.selectedBlockIndex;
+
+      try {
+        state.merkleProof = await fetchJson(`/blockchain/blocks/${blockIndex}/transactions/${transactionIndex}/merkle-proof`);
+        render();
+      } catch (error) {
+        state.notice = { type: "error", text: error instanceof Error ? error.message : String(error) };
+        render();
+      }
+    });
+  }
 }
 
 async function syncRoute() {
@@ -681,6 +919,8 @@ async function syncRoute() {
 }
 
 refreshButton.addEventListener("click", async () => {
+  state.notice = null;
+  state.merkleProof = null;
   await loadBlockchainOverview();
   await syncRoute();
 });

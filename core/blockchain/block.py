@@ -4,7 +4,32 @@ from .block_header import BlockHeader
 import time
 
 class Block(Hashable):
+    """
+    Represents a single block in the blockchain.
+    
+    A block contains a header (with metadata and hash pointers), a list of transactions,
+    and a Merkle tree structure. The block's integrity is ensured through:
+    - SHA-256 hashing of the block header
+    - Merkle tree root hash of all transactions
+    - Hash pointer to the previous block
+    
+    Attributes:
+        index: The block's position in the blockchain
+        header: BlockHeader object with metadata and hash information
+        transactions: List of Transaction objects in this block
+        merkle_tree: MerkleTree object for proof generation
+        hash: The calculated SHA-256 hash of the block header
+    """
+    
     def __init__(self, block_index, previous_hash, transactions):
+        """
+        Initialize a new block.
+        
+        Args:
+            block_index: The position of this block in the chain
+            previous_hash: Hash of the previous block (for chain linking)
+            transactions: List of Transaction objects to include in the block
+        """
         super().__init__()
         # Store the block index passed to the constructor
         self.index = block_index
@@ -15,14 +40,34 @@ class Block(Hashable):
         self.build_block_header(previous_hash)
         self.calculate_hash()
 
-    # Build the Merkle tree from the block's transactions
     def build_merkle_tree(self):
+        """
+        Build the Merkle tree from the block's transactions.
+        
+        Creates a complete binary tree where:
+        - Leaves are hashes of individual transactions
+        - Internal nodes are hashes of their children
+        - Root hash is stored in the block header
+        
+        For blocks with no transactions, merkle_tree remains None.
+        """
         if self.transactions is not None and len(self.transactions) > 0:
             self.merkle_tree = MerkleTree()
             self.merkle_tree.build_tree(self.transactions)
 
-    # Build the block header using the previous block's hash
     def build_block_header(self, previous_hash):
+        """
+        Build the block header with metadata.
+        
+        The block header contains:
+        - Index and timestamp
+        - Merkle root (for transaction integrity)
+        - Nonce and difficulty (for PoW, set to 0 in MVP)
+        - Previous block's hash (for chain linking)
+        
+        Args:
+            previous_hash: Hash of the previous block in the chain
+        """
         self.header = BlockHeader(
             # Use the stored block index (fallback to 0)
             index=self.index if hasattr(self, 'index') else 0,
@@ -35,13 +80,29 @@ class Block(Hashable):
             previous_hash=previous_hash
         )
 
-    # Calculate the hash of the block header and update the block's hash
     def calculate_hash(self):
+        """
+        Calculate and store the SHA-256 hash of the block header.
+        
+        Updates both the header's hash field and the block's hash field to maintain
+        consistency. This hash commits to all block data (transactions via merkle root,
+        timestamp, nonce, difficulty, and previous block hash).
+        """
         self.header.hash = self.header.calculate_hash()
         self.hash = self.header.hash
 
-    # Internally validate the block by checking the integrity of its hash and Merkle root
     def validate(self) -> bool:
+        """
+        Validate the block's integrity.
+        
+        Checks that:
+        1. The block's hash matches the recalculated hash from header fields
+        2. The Merkle root matches a freshly built tree from transactions
+           (detects tampering with transactions)
+        
+        Returns:
+            bool: True if block is valid, False if tampering or corruption detected
+        """
         # Temporal new Merkle Tree build if not genesis block
         if len(self.transactions) > 0:
             rebuilt_tree = MerkleTree()
@@ -70,8 +131,18 @@ class Block(Hashable):
 
         return True
 
-    # Convert the block to a dictionary representation, including its header and transactions
     def to_dict(self):
+        """
+        Convert the block to a dictionary representation.
+        
+        Used for JSON serialization and API responses. Includes validation status
+        calculated at serialization time.
+        
+        Returns:
+            dict: Block data with keys:
+                - index, valid, timestamp, merkle_root, nonce, difficulty
+                - hash, previous_hash, transactions (as list of dicts)
+        """
         return {
             "index": self.index,
             "valid": self.validate(),
@@ -84,8 +155,13 @@ class Block(Hashable):
             "transactions": [tx.to_dict() for tx in self.transactions] if self.transactions else [],
         }
 
-    # Print the block's details, including its header and transactions
     def print_block(self):
+        """
+        Print a human-readable representation of the block and its contents.
+        
+        Output includes block header, validation status, all transaction details,
+        and hash information. Useful for debugging and CLI inspection.
+        """
         print(f"Block Index: {self.header.index}")
         print(f"Block Valid: {self.validate()}")
         print(f"Timestamp: {self.header.timestamp}")
