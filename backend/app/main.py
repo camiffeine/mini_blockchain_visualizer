@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 from datetime import datetime
 
@@ -6,6 +7,7 @@ from fastapi import FastAPI, Request, status
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from pydantic import ValidationError
 
 from .routes import blockchain_router, transaction_router
@@ -48,6 +50,13 @@ app = FastAPI(
 # ============================================================================
 # Middleware Setup
 # ============================================================================
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=os.getenv("SESSION_SECRET_KEY", "mini-merkle-blockchain-demo-secret-key"),
+    same_site="lax",
+    https_only=os.getenv("SESSION_COOKIE_SECURE", "false").lower() == "true",
+)
+
 # CORS Middleware - Allow frontend to communicate with backend
 app.add_middleware(
     CORSMiddleware,
