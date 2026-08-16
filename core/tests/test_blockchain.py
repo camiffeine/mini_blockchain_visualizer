@@ -6,6 +6,7 @@ import pytest
 from core.blockchain.transaction import Transaction
 from core.blockchain.blockchain import Blockchain
 from core.exceptions import BlockchainException, TransactionError, InvalidBlockError
+from backend.app.services.blockchain_service import BlockchainService
 
 
 class TestBlockchainCreation:
@@ -135,20 +136,40 @@ class TestBlockchainTampering:
         block = blockchain_instance.get_block(1)
         assert block.transactions[0].metadata == "Tampered!"
 
-    def test_tamper_transaction_rebuilds_merkle_tree(self, blockchain_instance, sample_transactions):
-        """Test that tampering rebuilds the merkle tree."""
+    def test_tamper_transaction_invalidates_block_and_chain(self, blockchain_instance, sample_transactions):
+        """Test that tampering a committed transaction invalidates the block and the chain."""
         for tx in sample_transactions:
             blockchain_instance.add_transaction(tx)
-        
+
         block_before = blockchain_instance.get_block(1)
         hash_before = block_before.hash
-        
+        assert blockchain_instance.validate_chain() is True
+
         new_tx = Transaction(None, None, 0, "Tampered!")
         blockchain_instance.tamper_transaction(1, 0, new_tx)
-        
+
         block_after = blockchain_instance.get_block(1)
-        assert block_after.validate() is True  # Should be valid because merkle tree was rebuilt
-        assert block_after.hash != hash_before  # Hash should change
+        assert block_after.validate() is False
+        assert block_after.hash == hash_before
+        assert blockchain_instance.validate_chain() is False
+
+    def test_tamper_transaction_makes_merkle_proof_invalid(self, sample_transactions):
+        """Test that a tampered block cannot produce a valid Merkle proof."""
+        service = BlockchainService()
+        for tx in sample_transactions[:3]:
+            service.blockchain.add_transaction(tx)
+        service.blockchain.create_block()
+
+        original_proof = service.get_merkle_proof(1, 0)
+        assert original_proof is not None
+        assert original_proof.valid is True
+
+        new_tx = Transaction(None, None, 0, "Tampered!")
+        service.blockchain.tamper_transaction(1, 0, new_tx)
+
+        tampered_proof = service.get_merkle_proof(1, 0)
+        assert tampered_proof is not None
+        assert tampered_proof.valid is False
 
     def test_tamper_transaction_invalid_block_index(self, blockchain_instance, sample_transactions):
         """Test tampering with invalid block index raises error."""

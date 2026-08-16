@@ -192,13 +192,13 @@ async function loadBlockchainOverview() {
     }
 
     if (state.selectedBlockIndex !== null && state.selectedBlockIndex !== undefined) {
-      await loadBlockDetails(state.selectedBlockIndex);
+      await loadBlockDetails(state.selectedBlockIndex, true);
     }
 
     state.lastRefresh = new Date();
     setConnectionBadge(
       status?.blockchain_valid ? "status-chip--ok" : "status-chip--bad",
-      status?.blockchain_valid ? "Blockchain valid" : "Blockchain has integrity issues",
+      status?.blockchain_valid ? "Blockchain valid" : "Blockchain integrity issue: tampering detected",
     );
   } catch (error) {
     state.error = error instanceof Error ? error.message : String(error);
@@ -210,14 +210,14 @@ async function loadBlockchainOverview() {
   }
 }
 
-async function loadBlockDetails(index) {
+async function loadBlockDetails(index, forceRefresh = false) {
   if (index === null || index === undefined) {
     state.selectedBlockDetails = null;
     return null;
   }
 
   const cached = state.selectedBlockDetails;
-  if (cached && cached.index === index) {
+  if (!forceRefresh && cached && cached.index === index) {
     return cached;
   }
 
@@ -253,7 +253,7 @@ function buildDashboardView() {
         </div>
         <div class="badge-row">
           <span class="badge ${status?.blockchain_valid ? "badge--accent" : "badge--danger"}">
-            ${escapeHtml(status?.blockchain_valid ? "Valid chain" : "Invalid chain")}
+            ${escapeHtml(status?.blockchain_valid ? "Valid chain" : "Invalid chain — tampering detected")}
           </span>
           <span class="badge">${escapeHtml(blocks.length)} blocks</span>
           <span class="badge">${escapeHtml(totalTransactions)} total transactions</span>
@@ -286,7 +286,7 @@ function buildDashboardView() {
               </div>
               <div class="detail-pair">
                 <span>Valid</span>
-                <strong>${escapeHtml(selectedBlock.valid ? "Yes" : "No")}</strong>
+                <strong>${escapeHtml(selectedBlock.valid ? "Yes" : "No — tampered")}</strong>
               </div>
               <div class="detail-pair">
                 <span>Merkle root</span>
@@ -395,9 +395,9 @@ function buildBlockchainView() {
               <div class="card-header">
                 <div>
                   <h3>Block ${escapeHtml(block.index)}</h3>
-                  <p>${escapeHtml(block.valid ? "Validated" : "Invalid")}</p>
+                  <p>${escapeHtml(block.valid ? "Validated" : "Merkle mismatch detected")}</p>
                 </div>
-                <span class="badge ${block.valid ? "badge--accent" : "badge--danger"}">${escapeHtml(block.valid ? "Valid" : "Invalid")}</span>
+                <span class="badge ${block.valid ? "badge--accent" : "badge--danger"}">${escapeHtml(block.valid ? "Valid" : "Invalid — tampered")}</span>
               </div>
 
               <div class="hash-block">
@@ -474,7 +474,7 @@ function buildBlockDetailsView() {
               <h3>Block header</h3>
               <div class="details-grid" style="margin-top: 14px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
                 <div class="detail-pair"><span>Index</span><strong>${escapeHtml(block.index)}</strong></div>
-                <div class="detail-pair"><span>Valid</span><strong>${escapeHtml(block.valid ? "Yes" : "No")}</strong></div>
+                <div class="detail-pair"><span>Valid</span><strong>${escapeHtml(block.valid ? "Yes" : "No — tampered")}</strong></div>
                 <div class="detail-pair"><span>Timestamp</span><strong>${escapeHtml(formatTimestamp(block.timestamp))}</strong></div>
                 <div class="detail-pair"><span>Nonce</span><strong>${escapeHtml(block.nonce)}</strong></div>
                 <div class="detail-pair"><span>Difficulty</span><strong>${escapeHtml(block.difficulty)}</strong></div>
@@ -678,7 +678,7 @@ function buildMerkleTreeView() {
 
         ${proof ? `
           <div class="proof-result ${proof.valid ? "proof-result--valid" : "proof-result--invalid"}">
-            <div class="proof-status">${proof.valid ? "Valid proof" : "Invalid proof"}</div>
+            <div class="proof-status">${proof.valid ? "Valid proof" : "Invalid proof — transaction no longer matches the committed Merkle root"}</div>
             <div class="proof-row"><span>Transaction hash</span><code>${escapeHtml(proof.proof.transaction_hash)}</code></div>
             <div class="proof-row"><span>Merkle root</span><code>${escapeHtml(proof.proof.merkle_root)}</code></div>
             <ul class="proof-list">
@@ -871,8 +871,9 @@ function bindDynamicHandlers() {
           method: "POST",
           body: JSON.stringify(payload),
         });
-        state.notice = { type: "success", text: `Tamper applied to block ${state.selectedBlockIndex}, transaction #${transactionIndex}.` };
+        state.notice = { type: "success", text: `Tamper applied to block ${state.selectedBlockIndex}, transaction #${transactionIndex}. The block and its Merkle proofs are now invalid.` };
         state.merkleProof = null;
+        state.selectedBlockDetails = null;
         await loadBlockchainOverview();
       } catch (error) {
         state.notice = { type: "error", text: error instanceof Error ? error.message : String(error) };

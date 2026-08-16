@@ -166,16 +166,19 @@ class BlockchainService:
         block = self.blockchain.get_block(block_index)
         if block is None:
             return None
-        if block.merkle_tree is None:
-            return None
         if transaction_index < 0 or transaction_index >= len(block.transactions):
             return None
 
-        proof = block.merkle_tree.generate_proof(transaction_index)
+        current_tree = MerkleTree()
+        current_tree.build_tree(block.transactions)
+        if current_tree.root is None:
+            return None
+
+        proof = current_tree.generate_proof(transaction_index)
         proof_response = self.merkle_proof_to_response(proof)
 
-        leaf_hash = block.merkle_tree.leaves[transaction_index].hash
-        is_valid = MerkleTree.verify_proof(leaf_hash, proof, block.header.merkle_root)
+        leaf_hash = current_tree.leaves[transaction_index].hash
+        is_valid = block.validate() and MerkleTree.verify_proof(leaf_hash, proof, block.header.merkle_root)
 
         return MerkleProofVerificationResponse(
             proof=proof_response,

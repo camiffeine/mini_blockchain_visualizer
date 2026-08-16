@@ -180,15 +180,16 @@ class Blockchain:
     def tamper_transaction(self, block_index: int, transaction_index: int, new_transaction: Transaction):
         """
         Tamper with a specific transaction in a block for demonstration purposes.
-        
-        This method replaces a transaction in a block with a new one and rebuilds
-        the Merkle tree and block hash. This is used to demonstrate tamper detection.
-        
+
+        This intentionally mutates the committed data without rebuilding the Merkle tree
+        or recalculating the block hash. The block should therefore fail validation and
+        any Merkle proof generated from the original committed root becomes invalid.
+
         Args:
             block_index: The index of the block containing the transaction
             transaction_index: The index of the transaction within the block
             new_transaction: The new transaction to replace the old one with
-            
+
         Raises:
             InvalidBlockError: If block or transaction index is invalid
         """
@@ -201,10 +202,5 @@ class Blockchain:
                 f"Transaction index {transaction_index} is out of bounds for block {block_index}."
             )
 
-        # Tamper with the specified transaction
+        # Intentionally mutate the transaction without reconciling the Merkle root or block hash.
         block.transactions[transaction_index] = new_transaction
-        # Rebuild the Merkle tree and recalculate the block hash after tampering
-        block.merkle_tree = None  # Reset the Merkle tree before rebuilding
-        block.build_merkle_tree()
-        block.header.merkle_root = block.merkle_tree.root.hash if block.merkle_tree and block.merkle_tree.root else ""
-        block.calculate_hash()

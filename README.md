@@ -1,5 +1,10 @@
 # Mini Merkle Blockchain Visualizer
 
+> [!TIP]
+> Check out a live demo of the app at Render: [https://mini-merkle-blockchain.onrender.com/](https://mini-merkle-blockchain.onrender.com/)
+>
+> For local development, follow the instructions below to run the app on your machine.
+
 A simple proof-of-concept blockchain explorer that demonstrates **Merkle Tree integrity verification**, **tamper detection**, and **proof of membership** in an interactive web interface.
 
 Built for educational purposes to illustrate cryptographic concepts for my *Introduction to Cryptography and Information Security* course at uni.
@@ -82,6 +87,7 @@ The following Architecture Principles have been considered during the implementa
 
 - Python 3.9+ installed
 - pip package manager
+- uv installed for virtual environment management
 
 ### Installation and Running the Application
 
@@ -107,7 +113,7 @@ The following Architecture Principles have been considered during the implementa
     source .venv/bin/activate
    ```
 
-4. **Start the backend server:**
+4. **Start the backend server in development mode:**
    ```bash
    # Windows
    fastapi dev .\backend\app\main.py
@@ -122,6 +128,9 @@ The following Architecture Principles have been considered during the implementa
    ```
 
    The frontend will load automatically. The dashboard displays live blockchain status.
+
+> [!NOTE]
+> The project includes a Dockerfile. You can build and run the Docker image for a containerized deployment setup. It also runs on `localhost:8000` by default.
 
 ## Walkthrough
 

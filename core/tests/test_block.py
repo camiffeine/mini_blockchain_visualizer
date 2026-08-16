@@ -71,27 +71,22 @@ class TestBlockValidation:
         # Block should now be invalid
         assert block.validate() is False
 
-    def test_block_recalculation_after_transaction_change(self, sample_transactions):
-        """Test that block remains valid after tampering if merkle tree is rebuilt."""
+    def test_block_remains_invalid_after_transaction_tampering(self, sample_transactions):
+        """Test that tampering with a committed transaction invalidates the block."""
         block = Block(0, "0" * 64, sample_transactions)
         block.build_merkle_tree()
         block.calculate_hash()
-        
+
         initial_hash = block.hash
         assert block.validate() is True
-        
-        # Tamper with a transaction AND rebuild merkle tree
+
+        # Tamper with a transaction without recomputing the Merkle root or block hash.
         tampered_tx = Transaction(None, None, 0, "Tampering_tx!")
         block.transactions[1] = tampered_tx
-        block.merkle_tree = None
-        block.build_merkle_tree()
-        block.header.merkle_root = block.merkle_tree.root.hash if block.merkle_tree and block.merkle_tree.root else ""
-        block.calculate_hash()
-        
-        # Block should still be valid (because we rebuilt everything)
-        assert block.validate() is True
-        # But hash should have changed
-        assert block.hash != initial_hash
+
+        # The block should now be invalid because the original commitment no longer matches its data.
+        assert block.validate() is False
+        assert block.hash == initial_hash
 
 
 class TestBlockMerkleTree:
