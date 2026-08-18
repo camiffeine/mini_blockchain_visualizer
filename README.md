@@ -1,7 +1,7 @@
 # Mini Blockchain Visualizer
 
 > [!TIP]
-> Check out a live demo of the app at Render: [https://mini-merkle-blockchain.onrender.com/](https://mini-merkle-blockchain.onrender.com/)
+> Check out a live demo of the app at Render: [https://mini-blockchain-visualizer.onrender.com](https://mini-blockchain-visualizer.onrender.com)
 >
 > For local development, follow the instructions below to run the app on your machine.
 
