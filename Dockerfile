@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for Mini Merkle Blockchain
+# Multi-stage Dockerfile for Mini Blockchain Visualizer
 # Stage 1: Build environment
 FROM python:3.11-slim AS builder
 

@@ -1,4 +1,4 @@
-# Mini Merkle Blockchain Visualizer
+# Mini Blockchain Visualizer
 
 > [!TIP]
 > Check out a live demo of the app at Render: [https://mini-merkle-blockchain.onrender.com/](https://mini-merkle-blockchain.onrender.com/)
@@ -93,8 +93,8 @@ The following Architecture Principles have been considered during the implementa
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/camiffeine/mini_merkle_blockchain.git
-   cd mini_merkle_blockchain
+   git clone https://github.com/camiffeine/mini_blockchain_visualizer.git
+   cd mini_blockchain_visualizer
    ```
 
 2. **Setup the virtual environment using uv**

@@ -1,12 +1,12 @@
 version: '3.8'
 
 services:
-  # Mini Merkle Blockchain Backend and Frontend
+  # Mini Blockchain Visualizer Backend and Frontend
   blockchain:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: mini-merkle-blockchain
+    container_name: mini_blockchain_visualizer
     ports:
       - "8000:8000"
     environment:

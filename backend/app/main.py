@@ -42,7 +42,7 @@ logger = setup_logging()
 # FastAPI App Setup
 # ============================================================================
 app = FastAPI(
-    title="Mini Merkle Blockchain",
+    title="Mini Blockchain Visualizer",
     description="A compact blockchain explorer with Merkle tree visualization and tampering detection.",
     version="1.0.0",
 )
@@ -127,7 +127,7 @@ async def root():
     index_file = frontend_dir / "index.html"
     if index_file.exists():
         return FileResponse(index_file)
-    return {"message": "Mini Merkle Blockchain - Backend is running"}
+    return {"message": "Mini Blockchain Visualizer - Backend is running"}
 
 # ============================================================================
 # Route Registration
@@ -135,4 +135,4 @@ async def root():
 app.include_router(blockchain_router.router)
 app.include_router(transaction_router.router)
 
-logger.info("Mini Merkle Blockchain backend initialized successfully")
+logger.info("Mini Blockchain Visualizer backend initialized successfully")
