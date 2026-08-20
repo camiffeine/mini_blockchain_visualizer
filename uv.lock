@@ -437,7 +437,7 @@ wheels = [
 ]
 
 [[package]]
-name = "mini-merkle-blockchain"
+name = "mini-blockchain-visualizer"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
